@@ -1,7 +1,7 @@
 
 /*
 * Code written for Battlecode: West hackathon on August 25-26th
-* Written by: Aaron Rodden, Andy Vo, Alexander Garcia, and Shaan Shiekh
+* Written by: Aaron Rodden, Andy Lo, Alexander Garcia, and Shaan Shiekh
 *
 */
 
@@ -17,6 +17,10 @@ class MyRobot extends BCAbstractRobot {
         this.robotAdjacent = false;
         this.direction = this.pickDirection();
         this.action = "";
+        this.finalnexus = false;
+        this.nexuslead = false;
+        this.tryingspots = false;
+        this.attackflag = false;
         this.moveList = [];
         this.priorityMap = new Array(7);
         for (var i = 0; i < 7; i++) {
@@ -104,9 +108,16 @@ class MyRobot extends BCAbstractRobot {
 
        this.turnsetup();
 
+
+      //purely for debugging
+        if ((this.me().team) == 0) {
+          this.action = "Nothing";
+          return this.execute();
+        }
+
         var potentialAttack = this.attackAdjacent();
-        this.log(this.step);
-        if (potentialAttack != null && this.step < 130) {
+        //this.log(this.step);
+        if (potentialAttack != null) {
             this.action = "Attack";
             this.direction  = potentialAttack;
             return this.execute();
@@ -114,172 +125,175 @@ class MyRobot extends BCAbstractRobot {
         else {
             this.action = "Nothing";
         }
-          var enemiesHere = this.gethostilenearby1();
-          if (enemiesHere.length > 0) {
-              for (var i = 0; i < enemiesHere.length; i++) {
-                  var enemy = enemiesHere[i];
-                    if (this.me().x == enemy.x && Math.abs(this.me().y-enemy.y) == 2) {
-                        if (this.me().y - enemy.y < 0) { //we are on the right side
-                            var leftMove = Math.floor(Math.random() * 5);
-                            if (leftMove == 0 && this.getInDirection(bc.NORTHWEST) == bc.EMPTY) {
-                                this.direction = bc.NORTHWEST;
-                                this.action = "Move";
-                                return this.execute;
-                            }
-                            else if (leftMove == 1 && this.getInDirection(bc.WEST) == bc.EMPTY) {
-                                this.direction = bc.WEST;
-                                this.action = "Move";
-                                return this.execute;
-                            }
-                            else if (leftMove == 2 && this.getInDirection(bc.SOUTHWEST) == bc.EMPTY) {
-                                this.direction = bc.SOUTHWEST;
-                                this.action = "Move";
-                                return this.execute;
-                            }
-                            else if (leftMove == 3 && this.getInDirection(bc.NORTH) == bc.EMPTY) {
-                                this.direction = bc.NORTH;
-                                this.action = "Move";
-                                return this.execute;
-                            }
-                            else if (leftMove == 4 && this.getInDirection(bc.SOUTH) == bc.EMPTY) {
-                                this.direction = bc.SOUTH;
-                                this.action = "Move";
-                                return this.execute;
-                            }
-                        }
 
-                        if (this.me().y - enemy.y > 0) { //we are on the left side
-                            var rightMove = Math.floor(Math.random() * 5);
-                            if (rightMove == 0 && this.getInDirection(bc.NORTHEAST) == bc.EMPTY) {
-                                this.direction = bc.NORTHEAST;
-                                this.action = "Move";
-                                return this.execute;
-                            }
-                            else if (rightMove == 1 && this.getInDirection(bc.EAST) == bc.EMPTY) {
-                                this.direction = bc.EAST;
-                                this.action = "Move";
-                                return this.execute;
-                            }
-                            else if (rightMove == 2 && this.getInDirection(bc.SOUTHEAST) == bc.EMPTY) {
-                                this.direction = bc.SOUTHEAST;
-                                this.action = "Move";
-                                return this.execute;
-                            }
-                            else if (rightMove == 3 && this.getInDirection(bc.SOUTH) == bc.EMPTY) {
-                                this.direction = bc.SOUTH;
-                                this.action = "Move";
-                                return this.execute;
-                            }
-                            else if (rightMove == 4 && this.getInDirection(bc.NORTH) == bc.EMPTY) {
-                                this.direction = bc.NORTH;
-                                this.action = "Move";
-                                return this.execute;
-                            }
-                        }
-                    }
 
-                    if (this.me().y == enemy.y && Math.abs(this.me().x-enemy.x) == 2) {
-                        if (this.me().x - enemy.x < 0) { //we are above enemy
-                            var upMove = Math.floor(Math.random() * 5);
-                            if (upMove == 0 && this.getInDirection(bc.NORTHWEST) == bc.EMPTY) {
-                                this.direction = bc.NORTHWEST;
-                                this.action = "Move";
-                                return this.execute;
-                            }
-                            else if (upMove == 1 && this.getInDirection(bc.WEST) == bc.EMPTY) {
-                                this.direction = bc.WEST;
-                                this.action = "Move";
-                                return this.execute;
-                            }
-                            else if (upMove == 2 && this.getInDirection(bc.EAST) == bc.EMPTY) {
-                                this.direction = bc.EAST;
-                                this.action = "Move";
-                                return this.execute;
-                            }
-                            else if (upMove == 3 && this.getInDirection(bc.NORTHEAST) == bc.EMPTY) {
-                                this.direction = bc.NORTHEAST;
-                                this.action = "Move";
-                                return this.execute;
-                            }
-                            else if (upMove == 4 && this.getInDirection(bc.NORTH) == bc.EMPTY) {
-                                this.direction = bc.NORTH;
-                                this.action = "Move";
-                                return this.execute;
-                            }
-                        }
+        //   var enemiesHere = this.gethostilenearby1();
+        //   if (enemiesHere.length > 0) {
+        //       for (var i = 0; i < enemiesHere.length; i++) {
+        //           var enemy = enemiesHere[i];
+        //             if (this.me().x == enemy.x && Math.abs(this.me().y-enemy.y) == 2) {
+        //                 if (this.me().y - enemy.y < 0) { //we are on the right side
+        //                     var leftMove = Math.floor(Math.random() * 5);
+        //                     if (leftMove == 0 && this.getInDirection(bc.NORTHWEST) == bc.EMPTY) {
+        //                         this.direction = bc.NORTHWEST;
+        //                         this.action = "Move";
+        //                         return this.execute;
+        //                     }
+        //                     else if (leftMove == 1 && this.getInDirection(bc.WEST) == bc.EMPTY) {
+        //                         this.direction = bc.WEST;
+        //                         this.action = "Move";
+        //                         return this.execute;
+        //                     }
+        //                     else if (leftMove == 2 && this.getInDirection(bc.SOUTHWEST) == bc.EMPTY) {
+        //                         this.direction = bc.SOUTHWEST;
+        //                         this.action = "Move";
+        //                         return this.execute;
+        //                     }
+        //                     else if (leftMove == 3 && this.getInDirection(bc.NORTH) == bc.EMPTY) {
+        //                         this.direction = bc.NORTH;
+        //                         this.action = "Move";
+        //                         return this.execute;
+        //                     }
+        //                     else if (leftMove == 4 && this.getInDirection(bc.SOUTH) == bc.EMPTY) {
+        //                         this.direction = bc.SOUTH;
+        //                         this.action = "Move";
+        //                         return this.execute;
+        //                     }
+        //                 }
 
-                        if (this.me().x - enemy.x > 0) { //we are below enemy
-                            var downMove = Math.floor(Math.random() * 5);
-                            if (downMove == 0 && this.getInDirection(bc.SOUTHWEST) == bc.EMPTY) {
-                                this.direction = bc.SOUTHWEST;
-                                this.action = "Move";
-                                return this.execute;
-                            }
-                            else if (downMove == 1 && this.getInDirection(bc.WEST) == bc.EMPTY) {
-                                this.direction = bc.WEST;
-                                this.action = "Move";
-                                return this.execute;
-                            }
-                            else if (downMove == 2 && this.getInDirection(bc.EAST) == bc.EMPTY) {
-                                this.direction = bc.EAST;
-                                this.action = "Move";
-                                return this.execute;
-                            }
-                            else if (downMove == 3 && this.getInDirection(bc.SOUTHEAST) == bc.EMPTY) {
-                                this.direction = bc.SOUTHEAST;
-                                this.action = "Move";
-                                return this.execute;
-                            }
-                            else if (downMove == 4 && this.getInDirection(bc.SOUTH) == bc.EMPTY) {
-                                this.direction = bc.SOUTH;
-                                this.action = "Move";
-                                return this.execute;
-                            }
-                        }
-                    }
+        //                 if (this.me().y - enemy.y > 0) { //we are on the left side
+        //                     var rightMove = Math.floor(Math.random() * 5);
+        //                     if (rightMove == 0 && this.getInDirection(bc.NORTHEAST) == bc.EMPTY) {
+        //                         this.direction = bc.NORTHEAST;
+        //                         this.action = "Move";
+        //                         return this.execute;
+        //                     }
+        //                     else if (rightMove == 1 && this.getInDirection(bc.EAST) == bc.EMPTY) {
+        //                         this.direction = bc.EAST;
+        //                         this.action = "Move";
+        //                         return this.execute;
+        //                     }
+        //                     else if (rightMove == 2 && this.getInDirection(bc.SOUTHEAST) == bc.EMPTY) {
+        //                         this.direction = bc.SOUTHEAST;
+        //                         this.action = "Move";
+        //                         return this.execute;
+        //                     }
+        //                     else if (rightMove == 3 && this.getInDirection(bc.SOUTH) == bc.EMPTY) {
+        //                         this.direction = bc.SOUTH;
+        //                         this.action = "Move";
+        //                         return this.execute;
+        //                     }
+        //                     else if (rightMove == 4 && this.getInDirection(bc.NORTH) == bc.EMPTY) {
+        //                         this.direction = bc.NORTH;
+        //                         this.action = "Move";
+        //                         return this.execute;
+        //                     }
+        //                 }
+        //             }
 
-                    //here
-                    if (Math.abs(this.me().x - enemy.x) == 2 && Math.abs(this.me().y - enemy.y) == 2) {
-                        var diagMove = Math.floor(Math.random() * 4);
-                        if (diagMove == 0 && this.getInDirection(bc.NORTH) == bc.EMPTY) {
-                            this.direction = bc.NORTH;
-                            this.action = "Move";
-                            return this.execute();
-                        }
-                        if (diagMove == 1 && this.getInDirection(bc.EAST) == bc.EMPTY) {
-                            this.direction = bc.EAST;
-                            this.action = "Move";
-                            return this.execute();
-                        }
-                        if (diagMove == 2 && this.getInDirection(bc.SOUTH) == bc.EMPTY) {
-                            this.direction = bc.SOUTH;
-                            this.action = "Move";
-                            return this.execute();
-                        }
-                        if (diagMove == 3 && this.getInDirection(bc.WEST) == bc.EMPTY) {
-                            this.direction = bc.WEST;
-                            this.action = "Move";
-                            return this.execute();
-                        }
-                    }
+        //             if (this.me().y == enemy.y && Math.abs(this.me().x-enemy.x) == 2) {
+        //                 if (this.me().x - enemy.x < 0) { //we are above enemy
+        //                     var upMove = Math.floor(Math.random() * 5);
+        //                     if (upMove == 0 && this.getInDirection(bc.NORTHWEST) == bc.EMPTY) {
+        //                         this.direction = bc.NORTHWEST;
+        //                         this.action = "Move";
+        //                         return this.execute;
+        //                     }
+        //                     else if (upMove == 1 && this.getInDirection(bc.WEST) == bc.EMPTY) {
+        //                         this.direction = bc.WEST;
+        //                         this.action = "Move";
+        //                         return this.execute;
+        //                     }
+        //                     else if (upMove == 2 && this.getInDirection(bc.EAST) == bc.EMPTY) {
+        //                         this.direction = bc.EAST;
+        //                         this.action = "Move";
+        //                         return this.execute;
+        //                     }
+        //                     else if (upMove == 3 && this.getInDirection(bc.NORTHEAST) == bc.EMPTY) {
+        //                         this.direction = bc.NORTHEAST;
+        //                         this.action = "Move";
+        //                         return this.execute;
+        //                     }
+        //                     else if (upMove == 4 && this.getInDirection(bc.NORTH) == bc.EMPTY) {
+        //                         this.direction = bc.NORTH;
+        //                         this.action = "Move";
+        //                         return this.execute;
+        //                     }
+        //                 }
 
-                    if (Math.abs(this.me().x - enemy.x) == 2 && Math.abs(this.me().y - enemy.y) == 1 || Math.abs(this.me().x - enemy.x) == 1 && Math.abs(this.me().y - enemy.y) == 2) {
-                        // this.action = "Nothing";
-                        // return this.execute();
-                        this.action = "Move";
-                        this.direction = this.runAway();
-                        return this.execute();
-                    }
+        //                 if (this.me().x - enemy.x > 0) { //we are below enemy
+        //                     var downMove = Math.floor(Math.random() * 5);
+        //                     if (downMove == 0 && this.getInDirection(bc.SOUTHWEST) == bc.EMPTY) {
+        //                         this.direction = bc.SOUTHWEST;
+        //                         this.action = "Move";
+        //                         return this.execute;
+        //                     }
+        //                     else if (downMove == 1 && this.getInDirection(bc.WEST) == bc.EMPTY) {
+        //                         this.direction = bc.WEST;
+        //                         this.action = "Move";
+        //                         return this.execute;
+        //                     }
+        //                     else if (downMove == 2 && this.getInDirection(bc.EAST) == bc.EMPTY) {
+        //                         this.direction = bc.EAST;
+        //                         this.action = "Move";
+        //                         return this.execute;
+        //                     }
+        //                     else if (downMove == 3 && this.getInDirection(bc.SOUTHEAST) == bc.EMPTY) {
+        //                         this.direction = bc.SOUTHEAST;
+        //                         this.action = "Move";
+        //                         return this.execute;
+        //                     }
+        //                     else if (downMove == 4 && this.getInDirection(bc.SOUTH) == bc.EMPTY) {
+        //                         this.direction = bc.SOUTH;
+        //                         this.action = "Move";
+        //                         return this.execute;
+        //                     }
+        //                 }
+        //             }
 
-                }
-          }
+        //             //here
+        //             if (Math.abs(this.me().x - enemy.x) == 2 && Math.abs(this.me().y - enemy.y) == 2) {
+        //                 var diagMove = Math.floor(Math.random() * 4);
+        //                 if (diagMove == 0 && this.getInDirection(bc.NORTH) == bc.EMPTY) {
+        //                     this.direction = bc.NORTH;
+        //                     this.action = "Move";
+        //                     return this.execute();
+        //                 }
+        //                 if (diagMove == 1 && this.getInDirection(bc.EAST) == bc.EMPTY) {
+        //                     this.direction = bc.EAST;
+        //                     this.action = "Move";
+        //                     return this.execute();
+        //                 }
+        //                 if (diagMove == 2 && this.getInDirection(bc.SOUTH) == bc.EMPTY) {
+        //                     this.direction = bc.SOUTH;
+        //                     this.action = "Move";
+        //                     return this.execute();
+        //                 }
+        //                 if (diagMove == 3 && this.getInDirection(bc.WEST) == bc.EMPTY) {
+        //                     this.direction = bc.WEST;
+        //                     this.action = "Move";
+        //                     return this.execute();
+        //                 }
+        //             }
+
+        //             if (Math.abs(this.me().x - enemy.x) == 2 && Math.abs(this.me().y - enemy.y) == 1 || Math.abs(this.me().x - enemy.x) == 1 && Math.abs(this.me().y - enemy.y) == 2) {
+        //                 // this.action = "Nothing";
+        //                 // return this.execute();
+        //                 this.action = "Move";
+        //                 this.direction = this.runAway();
+        //                 return this.execute();
+        //             }
+
+        //         }
+        //   }
 
 
 
         if (this.step % 10 == 0) {
             this.direction = this.pickDirection();
         }
-        this.goToSpawn();
+
+        this.wander();
 
         return this.execute();
     }
@@ -465,5 +479,98 @@ class MyRobot extends BCAbstractRobot {
         this.action = "Move";
     }
 
+    wander() {
+
+
+        var allies = this.getfriendlynearby();
+
+        if (this.nexuslead == true) {
+            this.action = "Nothing";
+            return
+        }
+
+        if (this.tryingspots == false) {
+            for (var i = 0; i < allies.length; i++) {
+                if (this.me().id != allies[i].id){
+                    if (allies[i].x == 10 && allies[i].y == 10) {
+                        //this.log("Ally prepared to nexus");
+                        this.tryingspots = true;
+                    }
+                }
+            }
+        }
+
+        if (this.tryingspots == true) {
+            var botsinplace = [];
+            for (var i = 0; i < allies.length; i++){
+                if (this.me().id != allies[i].id) {
+                    if ((allies[i].x == 10 && allies[i].y == 10) || (allies[i].x == 9 && allies[i].y == 11) || (allies[i].x == 11 && allies[i].y == 11) || (allies[i].x == 10 && allies[i].y == 12)) {
+                        var inplace = true;
+                        botsinplace.push(inplace);
+                    }
+                }
+            }
+            if (botsinplace.length == 4) {
+                this.log("Nexus formed, now defending");
+                this.action = "Move";
+                this.direction = this.pickDirection();
+                return
+            }
+        }
+
+        if (this.tryingspots == true) {
+            if ((this.me().x == 10 && this.me().y == 10) || (this.me().x == 9 && this.me().y == 11) || (this.me().x == 11 && this.me().y == 11)
+            || (this.me().x == 10 && this.me().y ==12)){
+                this.action = "Nothing";
+                return
+            }
+
+            //first try
+            var temp = this.getMovement(this.me().x,this.me().y,9,11);
+
+            if (this.finalnexus == false){
+                if(this.getInDirection(temp) == bc.EMPTY){
+                    this.log("Going to 9,11");
+                    this.action = "Move";
+                    this.direction = temp;
+                    return
+                }
+            }
+
+            if (this.finalnexus == false){
+                temp = this.getMovement(this.me().x,this.me().y,11,11);
+                if (this.getInDirection(temp) == bc.EMPTY){
+                    this.log("Going to 11,11");
+                    this.action = "Move";
+                    this.direction = temp;
+                    return
+                }
+            }
+
+            temp = this.getMovement(this.me().x,this.me().y,10,12);
+
+            this.finalnexus = true;
+            this.log("Going to 10,12");
+            this.action = "Move";
+            this.direction = temp;
+            return
+
+
+
+        }
+
+        if (this.me().x == 10 && this.me().y == 10) {
+            this.log("I am prepared to nexus");
+            this.action = "Nothing";
+            this.nexuslead == true;
+            return
+        }
+
+        var x = 10;
+        var y = 10;
+        this.action = "Move";
+        this.direction = this.getMovement(this.me().x,this.me().y,x,y);
+        return;
+    }
 
 }
