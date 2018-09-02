@@ -109,11 +109,11 @@ class MyRobot extends BCAbstractRobot {
        this.turnsetup();
 
 
-      //purely for debugging
-        if ((this.me().team) == 0) {
-          this.action = "Nothing";
-          return this.execute();
-        }
+      // //purely for debugging
+      //   if ((this.me().team) == 0) {
+      //     this.action = "Nothing";
+      //     return this.execute();
+      //   }
 
         var potentialAttack = this.attackAdjacent();
         //this.log(this.step);
